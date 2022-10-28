@@ -33,7 +33,7 @@ function parseOBJ(text) {
   let material = 'default';
   let object = 'default';
 
-  const noop = () => {};
+  const noop = () => { };
 
   function newGeometry() {
     // If there is an existing geometry and it's
@@ -157,7 +157,7 @@ function parseOBJ(text) {
   // remove any arrays that have no entries.
   for (const geometry of geometries) {
     geometry.data = Object.fromEntries(
-        Object.entries(geometry.data).filter(([, array]) => array.length > 0));
+      Object.entries(geometry.data).filter(([, array]) => array.length > 0));
   }
 
   return {
@@ -215,11 +215,11 @@ async function main() {
   // compiles and links the shaders, looks up attribute and uniform locations
   const meshProgramInfo = webglUtils.createProgramInfo(gl, [vs, fs]);
 
-  const response = await fetch('nozzle.obj');  
+  const response = await fetch('brain.obj');
   const text = await response.text();
   const obj = parseOBJ(text);
 
-  const parts = obj.geometries.map(({data}) => {
+  const parts = obj.geometries.map(({ data }) => {
     // Because data is just named arrays like this
     //
     // {
@@ -232,6 +232,7 @@ async function main() {
     // shader we can pass it directly into `createBufferInfoFromArrays`
     // from the article "less code more fun".
 
+    console.log(data)
     if (data.color) {
       if (data.position.length === data.color.length) {
         // it's 3. The our helper library assumes 4 so we need
@@ -264,11 +265,11 @@ async function main() {
         max[j] = Math.max(v, max[j]);
       }
     }
-    return {min, max};
+    return { min, max };
   }
 
   function getGeometriesExtents(geometries) {
-    return geometries.reduce(({min, max}, {data}) => {
+    return geometries.reduce(({ min, max }, { data }) => {
       const minMax = getExtents(data.position);
       return {
         min: min.map((min, ndx) => Math.min(minMax.min[ndx], min)),
@@ -284,10 +285,10 @@ async function main() {
   const range = m4.subtractVectors(extents.max, extents.min);
   // amount to move the object so its center is at the origin
   const objOffset = m4.scaleVector(
-      m4.addVectors(
-        extents.min,
-        m4.scaleVector(range, 0.5)),
-      -1);
+    m4.addVectors(
+      extents.min,
+      m4.scaleVector(range, 0.5)),
+    -1);
   const cameraTarget = [0, 0, 0];
   // figure out how far away to move the camera so we can likely
   // see the object.
@@ -340,7 +341,7 @@ async function main() {
     let u_world = m4.yRotation(time);
     u_world = m4.translate(u_world, ...objOffset);
 
-    for (const {bufferInfo, material} of parts) {
+    for (const { bufferInfo, material } of parts) {
       // calls gl.bindBuffer, gl.enableVertexAttribArray, gl.vertexAttribPointer
       webglUtils.setBuffersAndAttributes(gl, meshProgramInfo, bufferInfo);
       // calls gl.uniform
@@ -355,7 +356,7 @@ async function main() {
     // requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
-// render()
+  // render()
 }
 
 main();
